@@ -1,2 +1,3 @@
 # AzureDemo
-Showcase of Microsoft Azure
+
+First commit
