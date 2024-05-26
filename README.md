@@ -59,3 +59,12 @@ You can create the subscription here: https://azure.microsoft.com/en-us/free
 ## Configuration
 
 ### Azure Portal
+
+1. **Resource Group**
+
+	a. After creating an Azure Free Subscription, visit https://portal.azure.com and login with your credentials. <br />
+	b. Search for Resource Groups and select **Create** <br />
+	c. Choose a sensible name for your resource group, some guidance is provided by Microsoft [here](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming) <br />
+	d. Choose a Region - this will only store metadata about Resource Group
+	e. Review + Create
+3. 
