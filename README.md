@@ -7,17 +7,21 @@
   - [Azure Portal](https://github.com/krebor/AzureDemo/#teamcity) <br />
   - [Powershell](https://github.com/krebor/AzureDemo/#ansible) <br />
   
+[Notes](https://github.com/krebor/AzureDemo/#notes) <br />
+  
 [Final Overview](https://github.com/krebor/AzureDemo/#final-overview) <br />
 
 ## Introduction
 
 In this practice lab we will showcase basic Microsoft Azure functionality like creating and managing resources.
 
-First, we will create an Azure SQL Server and several Azure SQL Databases, which will be running on the created SQL server and within an elastic pool, which will enable them to share resources.
+First, we will create an Azure SQL Server and several Azure SQL Databases running under this SQL server.
 
 Similarly, we will also create an App Service Plan and several Web Apps within this plan.
 
-For provisioning of resources we will use Azure Portal and PowerShell.
+For provisioning of resources we will use Azure Portal and/or PowerShell.
+
+**If you are facing issues with any part of the deployment or task, please review Notes section first.**
 
 ## Assignment
 
@@ -54,7 +58,7 @@ You can create the subscription here: https://azure.microsoft.com/en-us/free
 	a. Open your Resource Group in Azure portal UI <br />
 	b. In the left navigation navigate to Automation > Export Template <br />
 	c. Save the generated JSON to a file <br />
-7. Upload the .ps1 file and ARM JSON file to a public git repository
+7. Upload the .ps1 file and ARM JSON file to a public git repository <br />
 
 ## Configuration
 
@@ -63,8 +67,54 @@ You can create the subscription here: https://azure.microsoft.com/en-us/free
 1. **Resource Group**
 
 	a. After creating an Azure Free Subscription, visit https://portal.azure.com and login with your credentials. <br />
-	b. Search for Resource Groups and select **Create** <br />
-	c. Choose a sensible name for your resource group, some guidance is provided by Microsoft [here](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming) <br />
-	d. Choose a Region - this will only store metadata about Resource Group
-	e. Review + Create
-3. 
+	b. Search for **Resource Groups** and select **Create** <br />
+	c. Choose a sensible name for your resource group (RG), some guidance is provided by Microsoft [here](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming) <br />
+	d. Choose a Region - this will only store metadata about Resource Group <br />
+	e. Review + Create <br />
+	
+2. **SQL Server**
+
+	a. Search for **SQL Servers** and select **Create** <br />
+	b. Choose appropriate RG, name and location - in this case "Germany West Central" <br />
+	c. Leave remaining settings Networking, Security and Additional settings at their default <br />
+	d. Review + Create <br />
+	
+3. **Databases**
+
+	a. Search for **SQL Databases** select **Create** <br />
+	b. Choose appropriate Name, RG, and Server (which we created in previous step) <br />
+	c. Choose a minimal SQL Service Tier - in this case we are going with DTU-based purchasing model, Basic tier <br />
+	d. Choose storage redundancy tier, in this case we are choosing **Zone-redundant backup storage**
+	d. Leave remaining settings Networking, Security and Additional settings at their default <br />
+	e. Review + Create <br />
+	f. Repeat steps to create all three SQL Databases <br />
+	
+4. **App Service Plan**
+
+	a. Search for **App Service plans** and select **Create** <br />
+	b. Choose appropriate Name, RG, Region and pricing plan - in this case **Free F1 (Shared infrastructure)** <br />
+	c. Choose an Operating System - in this case we are using Linux <br />
+	d. Review + Create <br />
+	
+5. **Web Apps**
+
+	a. Search for **App Services** and select **Create** <br />
+	b. Choose appropriate Name, RG, Region, App Service Plan and pricing plan <br />
+	c. Choose Publish - Code, Runtime Stack - Python 3.12, Operating System - Linux <br />
+	d. Leave remaining settings for Database, Deployment, Networking and Monitoring (App Insights - Disabled) at their default <br />
+	e. Review + Create <br />
+	f. Repeat these steps for two more Web apps
+	g. To create fourth and final Web App, use deploy_azure_web_app.ps1 PowerShell script provided in this repository
+	
+### PowerShell
+
+1. **Preparation**
+
+To ensure that required PowerShell modules are available, use the following commands:
+
+```
+Install-Module -Name Az -AllowClobber -Force
+```
+```
+Import-Module Az
+```
