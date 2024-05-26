@@ -152,7 +152,7 @@ New-AzWebApp -Name <Name> -Location <Location> -AppServicePlan <AppServicePlanNa
 
 ## Notes
 
-1.
+-----------
 
 If you're facing error *Authentication failed against tenant* when using *Connect-AzAccount* cmdlet, please use the following command:
 
@@ -162,8 +162,7 @@ Update-AzConfig -EnableLoginByWam $false
 
 Reference: https://github.com/Azure/azure-powershell/issues/24967
 
-
-2. 
+-----------
 
 If you're facing error BadGateway when creating a new App Service plan, try switching your Azure billing plan to Pay-As-You go and creating a new subscription (200$ free credit is still usable).
 
@@ -171,8 +170,7 @@ Alternatively, try waiting for the issue to resolve itself, or raise a ticket wi
 
 Reference: https://learn.microsoft.com/en-us/answers/questions/1657059/the-subscription-is-not-allowed-to-create-or-updat
 
-
-3. 
+-----------
 
 When exporting ARM template of your resource group you may face the following error:
 
