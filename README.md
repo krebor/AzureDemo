@@ -4,8 +4,8 @@
 
 [Configuration](https://github.com/krebor/AzureDemo/#configuration) <br />
 
-  - [Azure Portal](https://github.com/krebor/AzureDemo/#teamcity) <br />
-  - [Powershell](https://github.com/krebor/AzureDemo/#ansible) <br />
+  - [Azure Portal](https://github.com/krebor/AzureDemo/#azure-portal) <br />
+  - [Powershell](https://github.com/krebor/AzureDemo/#powershell) <br />
   
 [Notes](https://github.com/krebor/AzureDemo/#notes) <br />
   
