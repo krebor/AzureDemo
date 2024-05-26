@@ -108,8 +108,6 @@ You can create the subscription here: https://azure.microsoft.com/en-us/free
 	
 ### PowerShell
 
-1. **Preparation**
-
 To ensure that required PowerShell modules are available, use the following commands:
 
 ```
@@ -118,3 +116,76 @@ Install-Module -Name Az -AllowClobber -Force
 ```
 Import-Module Az
 ```
+```
+Connect-AzAccount
+```
+
+1. **Resource Group**
+
+```
+New-AzResourceGroup -Name <ResourceGroupName> -Location <Location>
+```
+
+2. **SQL Server**
+
+```
+New-AzSqlServer -ResourceGroupName <ResourceGroupName> -Location <Location> -ServerName <ServerName> -ServerVersion "12.0" -SqlAdministratorCredentials (Get-Credential)
+```
+
+3. **Databases**
+
+```
+New-AzSqlDatabase -ResourceGroupName <ResourceGroupName> -ServerName <ServerName> -DatabaseName <DatabaseName> -Edition Basic
+```
+
+4. **App Service Plan**
+
+```
+New-AzAppServicePlan -ResourceGroupName <ResourceGroupName> -Name <Name> -Location <Location> -Tier "Free"
+```
+
+5. **Web Apps**
+
+```
+New-AzWebApp -Name <Name> -Location <Location> -AppServicePlan <AppServicePlanName> -ResourceGroupName <ResourceGroupName>
+```
+
+## Notes
+
+1.
+
+If you're facing error *Authentication failed against tenant* when using *Connect-AzAccount* cmdlet, please use the following command:
+
+```
+Update-AzConfig -EnableLoginByWam $false
+```
+
+Reference: https://github.com/Azure/azure-powershell/issues/24967
+
+
+2. 
+
+If you're facing error BadGateway when creating a new App Service plan, try switching your Azure billing plan to Pay-As-You go and creating a new subscription (200$ free credit is still usable).
+
+Alternatively, try waiting for the issue to resolve itself, or raise a ticket with MS support if you're not using Free Tier subscription.
+
+Reference: https://learn.microsoft.com/en-us/answers/questions/1657059/the-subscription-is-not-allowed-to-create-or-updat
+
+
+3. 
+
+When exporting ARM template of your resource group you may face the following error:
+
+*XXX resource types cannot be exported yet and are not included in the template.*
+
+Some resource types cannot be exported and this is expected behaviour. 
+
+Required resources which could not be created can be provisioned by hand written configuration within ARM template.
+
+Reference: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/export-template-portal#limitations
+
+## Final Overview
+
+In this short demo we showcased some basic Azure tasks and touched upon provisioning resources via PowerShell.
+
+We also performed some troubleshooting to enable us to complete the assignment, and understand Azure platform in more detail.
