@@ -23,19 +23,16 @@ For provisioning of resources we will use Azure Portal and PowerShell.
 
 Required resources:
 
-• Git account on a platform where you can share your code publicly (e.g. GitHub)
-• Email address that you can use to create a free Azure subscription
+• Git account on a platform where you can share your code publicly (e.g. GitHub) <br />
+• Email address that you can use to create a free Azure subscription <br />
 
 Notes:
 
-• Use descriptive resource names
-• Use the cheapest resource versions that you can use
-• You can create additional resources if that will make resource administration
-easier
-• You can create additional resources if that will make resource prices lower
-• All assignment steps can be solved using the https://portal.azure.com/ UI, but if
-you wish to write your own ARM templates you can (this excludes the PowerShell
-step)
+• Use descriptive resource names <br />
+• Use the cheapest resource versions that you can use <br />
+• You can create additional resources if that will make resource administration easier <br />
+• You can create additional resources if that will make resource prices lower <br />
+• All assignment steps can be solved using the https://portal.azure.com/ UI, but if you wish to write your own ARM templates you can (this excludes the PowerShell step) <br />
 
 Assignment steps
 
@@ -59,3 +56,6 @@ You can create the subscription here: https://azure.microsoft.com/en-us/free
 	c. Save the generated JSON to a file <br />
 7. Upload the .ps1 file and ARM JSON file to a public git repository
 
+## Configuration
+
+### Azure Portal
