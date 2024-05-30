@@ -2,31 +2,34 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vulnerabilityAssessments_Default_storageContainerPath": {
-            "type": "SecureString"
+        "sqlPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "SQL Server Password"
+            }
         },
-        "servers_sql_azuredemo_staging_name": {
-            "defaultValue": "sql-azuredemo-staging",
+        "servers_sql_azuredemo_stg_name": {
+            "defaultValue": "sql-azuredemo-stg",
             "type": "String"
         },
-        "sites_app_azuredemo_staging_1_name": {
-            "defaultValue": "app-azuredemo-staging-1",
+        "sites_app_azuredemo_stg_1_name": {
+            "defaultValue": "app-azuredemo-stg-1",
             "type": "String"
         },
-        "sites_app_azuredemo_staging_2_name": {
-            "defaultValue": "app-azuredemo-staging-2",
+        "sites_app_azuredemo_stg_2_name": {
+            "defaultValue": "app-azuredemo-stg-2",
             "type": "String"
         },
-        "sites_app_azuredemo_staging_3_name": {
-            "defaultValue": "app-azuredemo-staging-3",
+        "sites_app_azuredemo_stg_3_name": {
+            "defaultValue": "app-azuredemo-stg-3",
             "type": "String"
         },
-        "sites_app_azuredemo_staging_4_name": {
-            "defaultValue": "app-azuredemo-staging-4",
+        "sites_app_azuredemo_stg_4_name": {
+            "defaultValue": "app-azuredemo-stg-4",
             "type": "String"
         },
-        "serverfarms_asp_azuredemo_staging_name": {
-            "defaultValue": "asp-azuredemo-staging",
+        "serverfarms_asp_azuredemo_stg_name": {
+            "defaultValue": "asp-azuredemo-stg",
             "type": "String"
         }
     },
@@ -35,44 +38,37 @@
         {
             "type": "Microsoft.Sql/servers",
             "apiVersion": "2023-08-01-preview",
-            "name": "[parameters('servers_sql_azuredemo_staging_name')]",
-            "location": "germanywestcentral",
+            "name": "[parameters('servers_sql_azuredemo_stg_name')]",
+            "location": "francecentral",
             "kind": "v12.0",
             "properties": {
-                "administratorLogin": "CloudSA5b1ac5c2",
+                "administratorLogin": "Krebor",
+                "administratorLoginPassword": "[parameters('sqlPassword')]",
                 "version": "12.0",
-                "minimalTlsVersion": "1.2",
-                "publicNetworkAccess": "Disabled",
-                "administrators": {
-                    "administratorType": "ActiveDirectory",
-                    "principalType": "User",
-                    "login": "practice_tenant_kb_outlook.com#EXT#@practicetenantkboutlook.onmicrosoft.com",
-                    "sid": "648e7745-b2c2-4106-a2ef-dfaa8219a1ad",
-                    "tenantId": "117a63a5-b598-461b-9356-84f6bb948427",
-                    "azureADOnlyAuthentication": true
-                },
+                "minimalTlsVersion": "None",
+                "publicNetworkAccess": "Enabled",
                 "restrictOutboundNetworkAccess": "Disabled"
             }
         },
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2023-12-01",
-            "name": "[parameters('serverfarms_asp_azuredemo_staging_name')]",
-            "location": "Germany West Central",
+            "name": "[parameters('serverfarms_asp_azuredemo_stg_name')]",
+            "location": "France Central",
             "sku": {
                 "name": "F1",
                 "tier": "Free",
                 "size": "F1",
                 "family": "F",
-                "capacity": 1
+                "capacity": 0
             },
-            "kind": "linux",
+            "kind": "app",
             "properties": {
                 "perSiteScaling": false,
                 "elasticScaleEnabled": false,
                 "maximumElasticWorkerCount": 1,
                 "isSpot": false,
-                "reserved": true,
+                "reserved": false,
                 "isXenon": false,
                 "hyperV": false,
                 "targetWorkerCount": 0,
@@ -81,25 +77,11 @@
             }
         },
         {
-            "type": "Microsoft.Sql/servers/administrators",
-            "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/ActiveDirectory')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
-            ],
-            "properties": {
-                "administratorType": "ActiveDirectory",
-                "login": "practice_tenant_kb_outlook.com#EXT#@practicetenantkboutlook.onmicrosoft.com",
-                "sid": "648e7745-b2c2-4106-a2ef-dfaa8219a1ad",
-                "tenantId": "117a63a5-b598-461b-9356-84f6bb948427"
-            }
-        },
-        {
             "type": "Microsoft.Sql/servers/advancedThreatProtectionSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled"
@@ -108,9 +90,9 @@
         {
             "type": "Microsoft.Sql/servers/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/CreateIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/CreateIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -119,9 +101,9 @@
         {
             "type": "Microsoft.Sql/servers/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/DbParameterization')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/DbParameterization')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -130,9 +112,9 @@
         {
             "type": "Microsoft.Sql/servers/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/DefragmentIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/DefragmentIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -141,9 +123,9 @@
         {
             "type": "Microsoft.Sql/servers/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/DropIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/DropIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -152,9 +134,9 @@
         {
             "type": "Microsoft.Sql/servers/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/ForceLastGoodPlan')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/ForceLastGoodPlan')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Enabled"
@@ -163,10 +145,10 @@
         {
             "type": "Microsoft.Sql/servers/auditingPolicies",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/Default')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/Default')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "auditingState": "Disabled"
@@ -175,9 +157,9 @@
         {
             "type": "Microsoft.Sql/servers/auditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 0,
@@ -190,23 +172,12 @@
             }
         },
         {
-            "type": "Microsoft.Sql/servers/azureADOnlyAuthentications",
-            "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
-            ],
-            "properties": {
-                "azureADOnlyAuthentication": true
-            }
-        },
-        {
             "type": "Microsoft.Sql/servers/connectionPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/default')]",
-            "location": "germanywestcentral",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/default')]",
+            "location": "francecentral",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "connectionType": "Default"
@@ -215,10 +186,10 @@
         {
             "type": "Microsoft.Sql/servers/databases",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1')]",
-            "location": "germanywestcentral",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1')]",
+            "location": "francecentral",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "sku": {
                 "name": "Basic",
@@ -228,11 +199,11 @@
             "kind": "v12.0,user",
             "properties": {
                 "collation": "SQL_Latin1_General_CP1_CI_AS",
-                "maxSizeBytes": 2147483648,
+                "maxSizeBytes": 1073741824,
                 "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                 "zoneRedundant": false,
                 "readScale": "Disabled",
-                "requestedBackupStorageRedundancy": "Zone",
+                "requestedBackupStorageRedundancy": "Geo",
                 "maintenanceConfigurationId": "/subscriptions/9c7b5096-0eb3-4474-8322-10a1095aefe6/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
                 "isLedgerOn": false,
                 "availabilityZone": "NoPreference"
@@ -241,10 +212,10 @@
         {
             "type": "Microsoft.Sql/servers/databases",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2')]",
-            "location": "germanywestcentral",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2')]",
+            "location": "francecentral",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "sku": {
                 "name": "Basic",
@@ -254,11 +225,11 @@
             "kind": "v12.0,user",
             "properties": {
                 "collation": "SQL_Latin1_General_CP1_CI_AS",
-                "maxSizeBytes": 2147483648,
+                "maxSizeBytes": 1073741824,
                 "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                 "zoneRedundant": false,
                 "readScale": "Disabled",
-                "requestedBackupStorageRedundancy": "Zone",
+                "requestedBackupStorageRedundancy": "Geo",
                 "maintenanceConfigurationId": "/subscriptions/9c7b5096-0eb3-4474-8322-10a1095aefe6/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
                 "isLedgerOn": false,
                 "availabilityZone": "NoPreference"
@@ -267,10 +238,10 @@
         {
             "type": "Microsoft.Sql/servers/databases",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3')]",
-            "location": "germanywestcentral",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3')]",
+            "location": "francecentral",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "sku": {
                 "name": "Basic",
@@ -280,11 +251,11 @@
             "kind": "v12.0,user",
             "properties": {
                 "collation": "SQL_Latin1_General_CP1_CI_AS",
-                "maxSizeBytes": 2147483648,
+                "maxSizeBytes": 1073741824,
                 "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                 "zoneRedundant": false,
                 "readScale": "Disabled",
-                "requestedBackupStorageRedundancy": "Zone",
+                "requestedBackupStorageRedundancy": "Geo",
                 "maintenanceConfigurationId": "/subscriptions/9c7b5096-0eb3-4474-8322-10a1095aefe6/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
                 "isLedgerOn": false,
                 "availabilityZone": "NoPreference"
@@ -293,9 +264,9 @@
         {
             "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/master/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/master/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled"
@@ -304,10 +275,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/auditingPolicies",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/master/Default')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/master/Default')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "auditingState": "Disabled"
@@ -316,9 +287,9 @@
         {
             "type": "Microsoft.Sql/servers/databases/auditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/master/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/master/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 0,
@@ -330,9 +301,9 @@
         {
             "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/master/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/master/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 0,
@@ -344,9 +315,9 @@
         {
             "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/master/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/master/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled"
@@ -355,18 +326,18 @@
         {
             "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/master/Current')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/master/Current')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {}
         },
         {
             "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/master/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/master/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled",
@@ -383,34 +354,20 @@
         {
             "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/master/Current')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/master/Current')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled"
             }
         },
         {
-            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
-            "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/master/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
-            ],
-            "properties": {
-                "recurringScans": {
-                    "isEnabled": false,
-                    "emailSubscriptionAdmins": true
-                }
-            }
-        },
-        {
             "type": "Microsoft.Sql/servers/devOpsAuditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "isAzureMonitorTargetEnabled": false,
@@ -422,9 +379,9 @@
         {
             "type": "Microsoft.Sql/servers/encryptionProtector",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/current')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/current')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "kind": "servicemanaged",
             "properties": {
@@ -436,9 +393,9 @@
         {
             "type": "Microsoft.Sql/servers/extendedAuditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 0,
@@ -451,11 +408,23 @@
             }
         },
         {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2023-08-01-preview",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/AllowAllWindowsAzureIps')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+            }
+        },
+        {
             "type": "Microsoft.Sql/servers/keys",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/ServiceManaged')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/ServiceManaged')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "kind": "servicemanaged",
             "properties": {
@@ -465,9 +434,9 @@
         {
             "type": "Microsoft.Sql/servers/securityAlertPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled",
@@ -482,56 +451,30 @@
             }
         },
         {
-            "type": "Microsoft.Sql/servers/sqlVulnerabilityAssessments",
-            "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
-            ],
-            "properties": {
-                "state": "Disabled"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/vulnerabilityAssessments",
-            "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
-            ],
-            "properties": {
-                "recurringScans": {
-                    "isEnabled": false,
-                    "emailSubscriptionAdmins": true
-                },
-                "storageContainerPath": "[parameters('vulnerabilityAssessments_Default_storageContainerPath')]"
-            }
-        },
-        {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2023-12-01",
-            "name": "[parameters('sites_app_azuredemo_staging_1_name')]",
-            "location": "Germany West Central",
+            "name": "[parameters('sites_app_azuredemo_stg_1_name')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_stg_name'))]"
             ],
-            "kind": "app,linux",
+            "kind": "app",
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('sites_app_azuredemo_staging_1_name'), '.azurewebsites.net')]",
+                        "name": "[concat(parameters('sites_app_azuredemo_stg_1_name'), '.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(parameters('sites_app_azuredemo_staging_1_name'), '.scm.azurewebsites.net')]",
+                        "name": "[concat(parameters('sites_app_azuredemo_stg_1_name'), '.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_staging_name'))]",
-                "reserved": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_stg_name'))]",
+                "reserved": false,
                 "isXenon": false,
                 "hyperV": false,
                 "dnsConfiguration": {},
@@ -540,7 +483,6 @@
                 "vnetContentShareEnabled": false,
                 "siteConfig": {
                     "numberOfWorkers": 1,
-                    "linuxFxVersion": "PYTHON|3.12",
                     "acrUseManagedIdentityCreds": false,
                     "alwaysOn": false,
                     "http20Enabled": false,
@@ -548,7 +490,7 @@
                     "minimumElasticInstanceCount": 0
                 },
                 "scmSiteAlsoStopped": false,
-                "clientAffinityEnabled": false,
+                "clientAffinityEnabled": true,
                 "clientCertEnabled": false,
                 "clientCertMode": "Required",
                 "hostNamesDisabled": false,
@@ -556,9 +498,8 @@
                 "customDomainVerificationId": "6D4324CC182B4F345B6850E690714EE7A70FD65F8248BC3E712DB8807883101B",
                 "containerSize": 0,
                 "dailyMemoryTimeQuota": 0,
-                "httpsOnly": true,
+                "httpsOnly": false,
                 "redundancyMode": "None",
-                "publicNetworkAccess": "Enabled",
                 "storageAccountRequired": false,
                 "keyVaultReferenceIdentity": "SystemAssigned"
             }
@@ -566,28 +507,28 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2023-12-01",
-            "name": "[parameters('sites_app_azuredemo_staging_2_name')]",
-            "location": "Germany West Central",
+            "name": "[parameters('sites_app_azuredemo_stg_2_name')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_stg_name'))]"
             ],
-            "kind": "app,linux",
+            "kind": "app",
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('sites_app_azuredemo_staging_2_name'), '.azurewebsites.net')]",
+                        "name": "[concat(parameters('sites_app_azuredemo_stg_2_name'), '.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(parameters('sites_app_azuredemo_staging_2_name'), '.scm.azurewebsites.net')]",
+                        "name": "[concat(parameters('sites_app_azuredemo_stg_2_name'), '.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_staging_name'))]",
-                "reserved": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_stg_name'))]",
+                "reserved": false,
                 "isXenon": false,
                 "hyperV": false,
                 "dnsConfiguration": {},
@@ -596,7 +537,6 @@
                 "vnetContentShareEnabled": false,
                 "siteConfig": {
                     "numberOfWorkers": 1,
-                    "linuxFxVersion": "PYTHON|3.12",
                     "acrUseManagedIdentityCreds": false,
                     "alwaysOn": false,
                     "http20Enabled": false,
@@ -604,7 +544,7 @@
                     "minimumElasticInstanceCount": 0
                 },
                 "scmSiteAlsoStopped": false,
-                "clientAffinityEnabled": false,
+                "clientAffinityEnabled": true,
                 "clientCertEnabled": false,
                 "clientCertMode": "Required",
                 "hostNamesDisabled": false,
@@ -612,9 +552,8 @@
                 "customDomainVerificationId": "6D4324CC182B4F345B6850E690714EE7A70FD65F8248BC3E712DB8807883101B",
                 "containerSize": 0,
                 "dailyMemoryTimeQuota": 0,
-                "httpsOnly": true,
+                "httpsOnly": false,
                 "redundancyMode": "None",
-                "publicNetworkAccess": "Enabled",
                 "storageAccountRequired": false,
                 "keyVaultReferenceIdentity": "SystemAssigned"
             }
@@ -622,28 +561,28 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2023-12-01",
-            "name": "[parameters('sites_app_azuredemo_staging_3_name')]",
-            "location": "Germany West Central",
+            "name": "[parameters('sites_app_azuredemo_stg_3_name')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_stg_name'))]"
             ],
-            "kind": "app,linux",
+            "kind": "app",
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('sites_app_azuredemo_staging_3_name'), '.azurewebsites.net')]",
+                        "name": "[concat(parameters('sites_app_azuredemo_stg_3_name'), '.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(parameters('sites_app_azuredemo_staging_3_name'), '.scm.azurewebsites.net')]",
+                        "name": "[concat(parameters('sites_app_azuredemo_stg_3_name'), '.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_staging_name'))]",
-                "reserved": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_stg_name'))]",
+                "reserved": false,
                 "isXenon": false,
                 "hyperV": false,
                 "dnsConfiguration": {},
@@ -652,7 +591,6 @@
                 "vnetContentShareEnabled": false,
                 "siteConfig": {
                     "numberOfWorkers": 1,
-                    "linuxFxVersion": "PYTHON|3.12",
                     "acrUseManagedIdentityCreds": false,
                     "alwaysOn": false,
                     "http20Enabled": false,
@@ -660,7 +598,7 @@
                     "minimumElasticInstanceCount": 0
                 },
                 "scmSiteAlsoStopped": false,
-                "clientAffinityEnabled": false,
+                "clientAffinityEnabled": true,
                 "clientCertEnabled": false,
                 "clientCertMode": "Required",
                 "hostNamesDisabled": false,
@@ -668,9 +606,8 @@
                 "customDomainVerificationId": "6D4324CC182B4F345B6850E690714EE7A70FD65F8248BC3E712DB8807883101B",
                 "containerSize": 0,
                 "dailyMemoryTimeQuota": 0,
-                "httpsOnly": true,
+                "httpsOnly": false,
                 "redundancyMode": "None",
-                "publicNetworkAccess": "Enabled",
                 "storageAccountRequired": false,
                 "keyVaultReferenceIdentity": "SystemAssigned"
             }
@@ -678,28 +615,28 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2023-12-01",
-            "name": "[parameters('sites_app_azuredemo_staging_4_name')]",
-            "location": "Germany West Central",
+            "name": "[parameters('sites_app_azuredemo_stg_4_name')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_stg_name'))]"
             ],
-            "kind": "app,linux",
+            "kind": "app",
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('sites_app_azuredemo_staging_4_name'), '.azurewebsites.net')]",
+                        "name": "[concat(parameters('sites_app_azuredemo_stg_4_name'), '.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(parameters('sites_app_azuredemo_staging_4_name'), '.scm.azurewebsites.net')]",
+                        "name": "[concat(parameters('sites_app_azuredemo_stg_4_name'), '.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_staging_name'))]",
-                "reserved": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_asp_azuredemo_stg_name'))]",
+                "reserved": false,
                 "isXenon": false,
                 "hyperV": false,
                 "dnsConfiguration": {},
@@ -732,46 +669,10 @@
         {
             "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_1_name'), '/ftp')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_1_name'), '/ftp')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_1_name'))]"
-            ],
-            "properties": {
-                "allow": false
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-            "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_2_name'), '/ftp')]",
-            "location": "Germany West Central",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_2_name'))]"
-            ],
-            "properties": {
-                "allow": false
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-            "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_3_name'), '/ftp')]",
-            "location": "Germany West Central",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_3_name'))]"
-            ],
-            "properties": {
-                "allow": false
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-            "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_4_name'), '/ftp')]",
-            "location": "Germany West Central",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_4_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_1_name'))]"
             ],
             "properties": {
                 "allow": true
@@ -780,46 +681,82 @@
         {
             "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_1_name'), '/scm')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_2_name'), '/ftp')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_1_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_2_name'))]"
             ],
             "properties": {
-                "allow": false
+                "allow": true
             }
         },
         {
             "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_2_name'), '/scm')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_3_name'), '/ftp')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_2_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_3_name'))]"
             ],
             "properties": {
-                "allow": false
+                "allow": true
             }
         },
         {
             "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_3_name'), '/scm')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_4_name'), '/ftp')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_3_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_4_name'))]"
             ],
             "properties": {
-                "allow": false
+                "allow": true
             }
         },
         {
             "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_4_name'), '/scm')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_1_name'), '/scm')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_4_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_1_name'))]"
+            ],
+            "properties": {
+                "allow": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+            "apiVersion": "2023-12-01",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_2_name'), '/scm')]",
+            "location": "France Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_2_name'))]"
+            ],
+            "properties": {
+                "allow": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+            "apiVersion": "2023-12-01",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_3_name'), '/scm')]",
+            "location": "France Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_3_name'))]"
+            ],
+            "properties": {
+                "allow": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+            "apiVersion": "2023-12-01",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_4_name'), '/scm')]",
+            "location": "France Central",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_4_name'))]"
             ],
             "properties": {
                 "allow": true
@@ -828,10 +765,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_1_name'), '/web')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_1_name'), '/web')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_1_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_1_name'))]"
             ],
             "properties": {
                 "numberOfWorkers": 1,
@@ -847,14 +784,14 @@
                     "hostingstart.html"
                 ],
                 "netFrameworkVersion": "v4.0",
-                "linuxFxVersion": "PYTHON|3.12",
+                "phpVersion": "5.6",
                 "requestTracingEnabled": false,
                 "remoteDebuggingEnabled": false,
                 "httpLoggingEnabled": false,
                 "acrUseManagedIdentityCreds": false,
                 "logsDirectorySizeLimit": 35,
                 "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "$app-azuredemo-staging-1",
+                "publishingUsername": "$app-azuredemo-stg-1",
                 "scmType": "None",
                 "use32BitWorkerProcess": true,
                 "webSocketsEnabled": false,
@@ -874,7 +811,6 @@
                 "autoHealEnabled": false,
                 "vnetRouteAllEnabled": false,
                 "vnetPrivatePortsCount": 0,
-                "publicNetworkAccess": "Enabled",
                 "localMySqlEnabled": false,
                 "ipSecurityRestrictions": [
                     {
@@ -909,10 +845,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_2_name'), '/web')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_2_name'), '/web')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_2_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_2_name'))]"
             ],
             "properties": {
                 "numberOfWorkers": 1,
@@ -928,14 +864,14 @@
                     "hostingstart.html"
                 ],
                 "netFrameworkVersion": "v4.0",
-                "linuxFxVersion": "PYTHON|3.12",
+                "phpVersion": "5.6",
                 "requestTracingEnabled": false,
                 "remoteDebuggingEnabled": false,
                 "httpLoggingEnabled": false,
                 "acrUseManagedIdentityCreds": false,
                 "logsDirectorySizeLimit": 35,
                 "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "$app-azuredemo-staging-2",
+                "publishingUsername": "$app-azuredemo-stg-2",
                 "scmType": "None",
                 "use32BitWorkerProcess": true,
                 "webSocketsEnabled": false,
@@ -955,7 +891,6 @@
                 "autoHealEnabled": false,
                 "vnetRouteAllEnabled": false,
                 "vnetPrivatePortsCount": 0,
-                "publicNetworkAccess": "Enabled",
                 "localMySqlEnabled": false,
                 "ipSecurityRestrictions": [
                     {
@@ -990,10 +925,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_3_name'), '/web')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_3_name'), '/web')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_3_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_3_name'))]"
             ],
             "properties": {
                 "numberOfWorkers": 1,
@@ -1009,14 +944,14 @@
                     "hostingstart.html"
                 ],
                 "netFrameworkVersion": "v4.0",
-                "linuxFxVersion": "PYTHON|3.12",
+                "phpVersion": "5.6",
                 "requestTracingEnabled": false,
                 "remoteDebuggingEnabled": false,
                 "httpLoggingEnabled": false,
                 "acrUseManagedIdentityCreds": false,
                 "logsDirectorySizeLimit": 35,
                 "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "$app-azuredemo-staging-3",
+                "publishingUsername": "$app-azuredemo-stg-3",
                 "scmType": "None",
                 "use32BitWorkerProcess": true,
                 "webSocketsEnabled": false,
@@ -1036,7 +971,6 @@
                 "autoHealEnabled": false,
                 "vnetRouteAllEnabled": false,
                 "vnetPrivatePortsCount": 0,
-                "publicNetworkAccess": "Enabled",
                 "localMySqlEnabled": false,
                 "ipSecurityRestrictions": [
                     {
@@ -1071,10 +1005,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_4_name'), '/web')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_4_name'), '/web')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_4_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_4_name'))]"
             ],
             "properties": {
                 "numberOfWorkers": 1,
@@ -1090,13 +1024,14 @@
                     "hostingstart.html"
                 ],
                 "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
                 "requestTracingEnabled": false,
                 "remoteDebuggingEnabled": false,
                 "httpLoggingEnabled": false,
                 "acrUseManagedIdentityCreds": false,
                 "logsDirectorySizeLimit": 35,
                 "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "$app-azuredemo-staging-4",
+                "publishingUsername": "$app-azuredemo-stg-4",
                 "scmType": "None",
                 "use32BitWorkerProcess": true,
                 "webSocketsEnabled": false,
@@ -1150,62 +1085,62 @@
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_1_name'), '/', parameters('sites_app_azuredemo_staging_1_name'), '.azurewebsites.net')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_1_name'), '/', parameters('sites_app_azuredemo_stg_1_name'), '.azurewebsites.net')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_1_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_1_name'))]"
             ],
             "properties": {
-                "siteName": "app-azuredemo-staging-1",
+                "siteName": "app-azuredemo-stg-1",
                 "hostNameType": "Verified"
             }
         },
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_2_name'), '/', parameters('sites_app_azuredemo_staging_2_name'), '.azurewebsites.net')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_2_name'), '/', parameters('sites_app_azuredemo_stg_2_name'), '.azurewebsites.net')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_2_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_2_name'))]"
             ],
             "properties": {
-                "siteName": "app-azuredemo-staging-2",
+                "siteName": "app-azuredemo-stg-2",
                 "hostNameType": "Verified"
             }
         },
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_3_name'), '/', parameters('sites_app_azuredemo_staging_3_name'), '.azurewebsites.net')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_3_name'), '/', parameters('sites_app_azuredemo_stg_3_name'), '.azurewebsites.net')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_3_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_3_name'))]"
             ],
             "properties": {
-                "siteName": "app-azuredemo-staging-3",
+                "siteName": "app-azuredemo-stg-3",
                 "hostNameType": "Verified"
             }
         },
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2023-12-01",
-            "name": "[concat(parameters('sites_app_azuredemo_staging_4_name'), '/', parameters('sites_app_azuredemo_staging_4_name'), '.azurewebsites.net')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('sites_app_azuredemo_stg_4_name'), '/', parameters('sites_app_azuredemo_stg_4_name'), '.azurewebsites.net')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_staging_4_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('sites_app_azuredemo_stg_4_name'))]"
             ],
             "properties": {
-                "siteName": "app-azuredemo-staging-4",
+                "siteName": "app-azuredemo-stg-4",
                 "hostNameType": "Verified"
             }
         },
         {
             "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled"
@@ -1214,10 +1149,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled"
@@ -1226,10 +1161,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled"
@@ -1238,10 +1173,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/CreateIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/CreateIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1250,10 +1185,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/CreateIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/CreateIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1262,10 +1197,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/CreateIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/CreateIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1274,10 +1209,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/DbParameterization')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/DbParameterization')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1286,10 +1221,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/DbParameterization')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/DbParameterization')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1298,10 +1233,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/DbParameterization')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/DbParameterization')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1310,10 +1245,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/DefragmentIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/DefragmentIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1322,10 +1257,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/DefragmentIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/DefragmentIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1334,10 +1269,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/DefragmentIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/DefragmentIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1346,10 +1281,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/DropIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/DropIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1358,10 +1293,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/DropIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/DropIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1370,10 +1305,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/DropIndex')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/DropIndex')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Disabled"
@@ -1382,10 +1317,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/ForceLastGoodPlan')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/ForceLastGoodPlan')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Enabled"
@@ -1394,10 +1329,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/ForceLastGoodPlan')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/ForceLastGoodPlan')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Enabled"
@@ -1406,10 +1341,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/advisors",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/ForceLastGoodPlan')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/ForceLastGoodPlan')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "autoExecuteValue": "Enabled"
@@ -1418,11 +1353,11 @@
         {
             "type": "Microsoft.Sql/servers/databases/auditingPolicies",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/Default')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/Default')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "auditingState": "Disabled"
@@ -1431,11 +1366,11 @@
         {
             "type": "Microsoft.Sql/servers/databases/auditingPolicies",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/Default')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/Default')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "auditingState": "Disabled"
@@ -1444,11 +1379,11 @@
         {
             "type": "Microsoft.Sql/servers/databases/auditingPolicies",
             "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/Default')]",
-            "location": "Germany West Central",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/Default')]",
+            "location": "France Central",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "auditingState": "Disabled"
@@ -1457,25 +1392,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/auditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
-            ],
-            "properties": {
-                "retentionDays": 0,
-                "isAzureMonitorTargetEnabled": false,
-                "state": "Disabled",
-                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/databases/auditingSettings",
-            "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 0,
@@ -1487,10 +1407,25 @@
         {
             "type": "Microsoft.Sql/servers/databases/auditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingSettings",
+            "apiVersion": "2023-08-01-preview",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 0,
@@ -1502,10 +1437,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "weeklyRetention": "PT0S",
@@ -1517,10 +1452,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "weeklyRetention": "PT0S",
@@ -1532,10 +1467,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "weeklyRetention": "PT0S",
@@ -1547,10 +1482,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 7,
@@ -1560,10 +1495,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 7,
@@ -1573,10 +1508,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 7,
@@ -1586,10 +1521,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 0,
@@ -1601,10 +1536,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 0,
@@ -1616,10 +1551,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "retentionDays": 0,
@@ -1631,76 +1566,76 @@
         {
             "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
-                "state": "Disabled"
+                "state": "Enabled"
             }
         },
         {
             "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
-                "state": "Disabled"
+                "state": "Enabled"
             }
         },
         {
             "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
-                "state": "Disabled"
+                "state": "Enabled"
             }
         },
         {
             "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/Current')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/Current')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {}
         },
         {
             "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/Current')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/Current')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {}
         },
         {
             "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/Current')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/Current')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {}
         },
         {
             "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled",
@@ -1717,10 +1652,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled",
@@ -1737,10 +1672,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/Default')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/Default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Disabled",
@@ -1757,10 +1692,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/Current')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-1/Current')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-1')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Enabled"
@@ -1769,10 +1704,10 @@
         {
             "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/Current')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-2/Current')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-2')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Enabled"
@@ -1781,58 +1716,13 @@
         {
             "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
             "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/Current')]",
+            "name": "[concat(parameters('servers_sql_azuredemo_stg_name'), '/sqldb-azuredemo-stg-3/Current')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_stg_name'), 'sqldb-azuredemo-stg-3')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_stg_name'))]"
             ],
             "properties": {
                 "state": "Enabled"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
-            "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-1/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-1')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
-            ],
-            "properties": {
-                "recurringScans": {
-                    "isEnabled": false,
-                    "emailSubscriptionAdmins": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
-            "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-2/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-2')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
-            ],
-            "properties": {
-                "recurringScans": {
-                    "isEnabled": false,
-                    "emailSubscriptionAdmins": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
-            "apiVersion": "2023-08-01-preview",
-            "name": "[concat(parameters('servers_sql_azuredemo_staging_name'), '/sqldb-azuredemo-staging-3/Default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sql_azuredemo_staging_name'), 'sqldb-azuredemo-staging-3')]",
-                "[resourceId('Microsoft.Sql/servers', parameters('servers_sql_azuredemo_staging_name'))]"
-            ],
-            "properties": {
-                "recurringScans": {
-                    "isEnabled": false,
-                    "emailSubscriptionAdmins": true
-                }
             }
         }
     ]

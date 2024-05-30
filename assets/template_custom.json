@@ -69,13 +69,6 @@
             "metadata": {
                 "description": "Staging Web App 3"
             }
-        },
-        "webApp4": {
-            "type": "string",
-            "defaultValue": "app-azuredemo-stg-4",
-            "metadata": {
-                "description": "Staging Web App 4"
-            }
         }
     },
     "functions": [],
@@ -217,21 +210,7 @@
                 "name": "[parameters('webApp3')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
             }
-        },
-        {
-            "name": "[parameters('webApp4')]",
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "2022-09-01",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
-            ],
-            "properties": {
-                "name": "[parameters('webApp4')]",
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
-            }
         }
-        
     ],
     "outputs": {}
 }

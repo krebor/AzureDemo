@@ -6,6 +6,7 @@
 
   - [Azure Portal](https://github.com/krebor/AzureDemo/#azure-portal) <br />
   - [Powershell](https://github.com/krebor/AzureDemo/#powershell) <br />
+  - [ARM Template](https://github.com/krebor/AzureDemo/#arm-template) <br />
   
 [Notes](https://github.com/krebor/AzureDemo/#notes) <br />
   
@@ -149,6 +150,33 @@ New-AzAppServicePlan -ResourceGroupName <ResourceGroupName> -Name <Name> -Locati
 ```
 New-AzWebApp -Name <Name> -Location <Location> -AppServicePlan <AppServicePlanName> -ResourceGroupName <ResourceGroupName>
 ```
+### ARM Template
+
+An ARM Template is a JSON file which follows a defined schema, and which is used to provision Azure resources via configuration rather than manual steps.
+
+You can find more information about creating your own ARM templates on [Microsoft Learn](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/overview), [YouTube](https://www.youtube.com/playlist?list=PLGjZwEtPN7j8_kgw92LHBrry2gnVc3NXQ) and other resources.
+
+After preparing your own ARM template for this assignment, you can deploy it via Azure Portal, PowerShell or Azure CLI.
+
+In this case, we can use the provided `template_custom.json` template, which will create the required resources in a Resource Group of your choice.
+
+**Please make sure to follow the assignment requirements and create your Resource Group in relevant region, since provided template uses Resource Group location as reference for new resources! Alternatively, you can modify the template and hardcode resource location within the Location parameter for each resource.**
+
+After you're happy with your ARM template, you can proceed with the deployment. <br />
+For this showcase, let's use PowerShell:
+
+```
+Connect-AzAccount
+
+$resourceGroupName = Read-Host -Prompt "Enter existing Resource Group name"
+$templateFile = Read-Host -Prompt "Provide file path to your ARM template"
+
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFile
+```
+
+After resources are provisioned in Azure, we can perform the required manual step of creating the fourth Web App via PowerShell. <br />
+
+You can do so by running provided script `deploy_azure_web_app.ps1`. <br />
 
 ## Notes
 
