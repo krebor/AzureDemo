@@ -1,0 +1,237 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sqlServer": {
+            "type": "string",
+            "defaultValue": "sql-azuredemo-stg",
+            "metadata": {
+                "description": "Staging SQL Server"
+            }
+        },
+        "sqlUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Staging SQL Server Username"
+            }
+        },
+        "sqlPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Staging SQL Server Password"
+            }
+        },
+        "sqlDB1": {
+            "type": "string",
+            "defaultValue": "sqldb-azuredemo-stg-1",
+            "metadata": {
+                "description": "Staging SQL DB 1"
+            }
+        },
+        "sqlDB2": {
+            "type": "string",
+            "defaultValue": "sqldb-azuredemo-stg-2",
+            "metadata": {
+                "description": "Staging SQL DB 2"
+            }
+        },
+                "sqlDB3": {
+            "type": "string",
+            "defaultValue": "sqldb-azuredemo-stg-3",
+            "metadata": {
+                "description": "Staging SQL DB 3"
+            }
+        },
+        "appServicePlan": {
+            "type": "string",
+            "defaultValue": "asp-azuredemo-stg",
+            "metadata": {
+                "description": "Staging App Service Plan"
+            }
+        },
+        "webApp1": {
+            "type": "string",
+            "defaultValue": "app-azuredemo-stg-1",
+            "metadata": {
+                "description": "Staging Web App 1"
+            }
+        },
+        "webApp2": {
+            "type": "string",
+            "defaultValue": "app-azuredemo-stg-2",
+            "metadata": {
+                "description": "Staging Web App 2"
+            }
+        },
+        "webApp3": {
+            "type": "string",
+            "defaultValue": "app-azuredemo-stg-3",
+            "metadata": {
+                "description": "Staging Web App 3"
+            }
+        },
+        "webApp4": {
+            "type": "string",
+            "defaultValue": "app-azuredemo-stg-4",
+            "metadata": {
+                "description": "Staging Web App 4"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('sqlServer')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2021-11-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "[parameters('sqlUsername')]",
+                "administratorLoginPassword": "[parameters('sqlPassword')]"
+            },
+            "resources": [
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2014-04-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', parameters('sqlServer'))]"
+                    ],
+                    "location": "[resourceGroup().location]",
+                    "name": "AllowAllWindowsAzureIps",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[format('{0}/{1}', parameters('sqlServer'), parameters('sqlDB1'))]",
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2021-11-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic",
+                "capacity": 5
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlServer'))]"
+            ],
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "edition": "Basic",
+                "maxSizeBytes": 1073741824,
+                "requestedServiceObjectiveName": "Basic"
+            }
+        },
+        {
+            "name": "[format('{0}/{1}', parameters('sqlServer'), parameters('sqlDB2'))]",
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2021-11-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic",
+                "capacity": 5
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlServer'))]"
+            ],
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "edition": "Basic",
+                "maxSizeBytes": 1073741824,
+                "requestedServiceObjectiveName": "Basic"
+            }
+        },
+        {
+            "name": "[format('{0}/{1}', parameters('sqlServer'), parameters('sqlDB3'))]",
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2021-11-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic",
+                "capacity": 5
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlServer'))]"
+            ],
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "edition": "Basic",
+                "maxSizeBytes": 1073741824,
+                "requestedServiceObjectiveName": "Basic"
+            }
+        },
+        {
+            "name": "[parameters('appServicePlan')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2022-09-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "F1",
+                "capacity": 1
+            },
+            "properties": {
+                "name": "[parameters('appServicePlan')]"
+            }
+        },
+        {
+            "name": "[parameters('webApp1')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-09-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
+            ],
+            "properties": {
+                "name": "[parameters('webApp1')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
+            }
+        },
+        {
+            "name": "[parameters('webApp2')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-09-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
+            ],
+            "properties": {
+                "name": "[parameters('webApp2')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
+            }
+        },
+        {
+            "name": "[parameters('webApp3')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-09-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
+            ],
+            "properties": {
+                "name": "[parameters('webApp3')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
+            }
+        },
+        {
+            "name": "[parameters('webApp4')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-09-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
+            ],
+            "properties": {
+                "name": "[parameters('webApp4')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]"
+            }
+        }
+        
+    ],
+    "outputs": {}
+}
